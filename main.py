@@ -100,12 +100,9 @@ if __name__ == '__main__':
     try:
         img_link, description_of_comic = search_comic()
         download_image(img_link, path, params='')
-        get_upload_link(access_token)
         upload_url = get_upload_link(access_token)
-        upload_pic_on_server(upload_url)
         photo_params, photo_hash, photo_server = upload_pic_on_server(upload_url)
         media_id = upload_pic(access_token, group_id, photo_params, photo_hash, photo_server)
-        upload_pic(access_token, group_id, photo_params, photo_hash, photo_server)
         upload_pic_to_the_wall(description_of_comic, user_id, access_token, media_id)
     except requests.exceptions.HTTPError:
         logging.exception()
