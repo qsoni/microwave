@@ -9,13 +9,13 @@ from dotenv import load_dotenv
 IMAGES_DIR = 'images'
 
 
-def upload_pic_to_the_wall(alt, user_id, access_token, media_id):
+def upload_pic_to_the_wall(description_of_comic, user_id, access_token, media_id):
     params = {
         'access_token': access_token,
         'owner_id': f'-{group_id}',
         'v': 5.131,
         'from_group': 1,
-        'message': alt,
+        'message': description_of_comic,
         'attachments': f'photo{user_id}_{media_id}'
     }
     url = 'https://api.vk.com/method/wall.post'
@@ -40,17 +40,19 @@ def upload_pic(access_token, group_id, photo_params, photo_hash, photo_server):
 
 
 def upload_pic_on_server(upload_url):
-    with open(os.path.join('images', 'pc.jpg'),'rb') as file:
+    with open(os.path.join('images', 'pc.jpg'), 'rb') as file:
         files = {
             'photo': file
         }
         url = upload_url
         response = requests.post(url, files=files)
         response.raise_for_status()
-    photo_params = response.json()['photo']
-    photo_hash = response.json()['hash']
-    photo_server = response.json()['server']
+    response_content = response.json()
+    photo_params = response_content['photo']
+    photo_hash = response_content['hash']
+    photo_server = response_content['server']
     return photo_params, photo_hash, photo_server
+
 
 def get_upload_link(access_token):
     params = {
@@ -64,6 +66,7 @@ def get_upload_link(access_token):
     upload_url = response.json()['response']['upload_url']
     return upload_url
 
+
 def search_comic():
     url = 'https://xkcd.com/info.0.json'
     response = requests.get(url)
@@ -71,15 +74,19 @@ def search_comic():
     num = response.json()['num']
     url = f'https://xkcd.com/{random.randint(1, num)}/info.0.json'
     response = requests.get(url)
-    img = response.json()['img']
-    alt = response.json()['alt']
-    return img, alt
+    response.raise_for_status()
+    response_content = response.json()
+    img_link = response_content['img']
+    description_of_comic = response_content['alt']
+    return img_link, description_of_comic
 
-def download_image(img, path,  params=''):
-    response = requests.get(img, params=params)
+
+def download_image(img_link, path,  params=''):
+    response = requests.get(img_link, params=params)
     response.raise_for_status()
     with open(path, 'wb') as file:
         file.write(response.content)
+
 
 if __name__ == '__main__':
     load_dotenv()
@@ -91,17 +98,16 @@ if __name__ == '__main__':
     os.makedirs(IMAGES_DIR, exist_ok=True)
     path = os.path.join(IMAGES_DIR, image_name)
     try:
-        img, alt = search_comic()
-        download_image(img, path, params='')
+        img_link, description_of_comic = search_comic()
+        download_image(img_link, path, params='')
         get_upload_link(access_token)
         upload_url = get_upload_link(access_token)
         upload_pic_on_server(upload_url)
         photo_params, photo_hash, photo_server = upload_pic_on_server(upload_url)
         media_id = upload_pic(access_token, group_id, photo_params, photo_hash, photo_server)
         upload_pic(access_token, group_id, photo_params, photo_hash, photo_server)
-        upload_pic_to_the_wall(alt, user_id, access_token, media_id)
+        upload_pic_to_the_wall(description_of_comic, user_id, access_token, media_id)
     except requests.exceptions.HTTPError:
         logging.exception()
     finally:
         shutil.rmtree('images')
-
