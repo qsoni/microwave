@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 IMAGES_DIR = 'images'
 
 
-def publish_pic_to_the_wall(description_of_comic, vk_user_id, vk_access_token, media_id, vk_group_id):
+def publish_pic_to_the_wall(description_of_comic, owner_id, vk_access_token, media_id, vk_group_id):
     params = {
         'access_token': vk_access_token,
         'owner_id': f'-{vk_group_id}',
         'v': 5.131,
         'from_group': 1,
         'message': description_of_comic,
-        'attachments': f'photo{vk_user_id}_{media_id}'
+        'attachments': f'photo{owner_id}_{media_id}'
     }
     url = 'https://api.vk.com/method/wall.post'
     response = requests.post(url, params=params)
@@ -35,8 +35,10 @@ def upload_pic_to_group_album(vk_access_token, vk_group_id, photo_params, photo_
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
     response = requests.post(url, params=params)
     response.raise_for_status()
-    media_id = response.json()['response'][0]['id']
-    return media_id
+    response_content = response.json()
+    media_id = response_content['response'][0]['id']
+    owner_id = response_content['response'][0]['owner_id']
+    return media_id, owner_id
 
 
 def upload_pic_on_vk_server(upload_url):
@@ -44,8 +46,8 @@ def upload_pic_on_vk_server(upload_url):
         files = {
             'photo': file
         }
-    url = upload_url
-    response = requests.post(url, files=files)
+        url = upload_url
+        response = requests.post(url, files=files)
     response.raise_for_status()
     response_content = response.json()
     photo_params = response_content['photo']
@@ -92,7 +94,6 @@ if __name__ == '__main__':
     load_dotenv()
     vk_group_id = os.getenv('VK_GROUP_ID')
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
-    vk_user_id = os.getenv('VK_USER_ID')
     image_name = 'pc.jpg'
     os.makedirs(IMAGES_DIR, exist_ok=True)
     path = os.path.join(IMAGES_DIR, image_name)
@@ -101,8 +102,8 @@ if __name__ == '__main__':
         download_image(img_link, path, params='')
         upload_url = get_the_server_address(vk_access_token, vk_group_id)
         photo_params, photo_hash, photo_server = upload_pic_on_vk_server(upload_url)
-        media_id = upload_pic_to_group_album(vk_access_token, vk_group_id, photo_params, photo_hash, photo_server)
-        publish_pic_to_the_wall(description_of_comic, vk_user_id, vk_access_token, media_id, vk_group_id)
+        media_id, owner_id = upload_pic_to_group_album(vk_access_token, vk_group_id, photo_params, photo_hash, photo_server)
+        publish_pic_to_the_wall(description_of_comic, owner_id, vk_access_token, media_id, vk_group_id)
     except requests.exceptions.HTTPError:
         logging.exception()
     finally:
