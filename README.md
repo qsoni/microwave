@@ -6,8 +6,6 @@
 
 Создать приложение можно в разделе 'Мои приложения'. Ссылка на него в шапке страницы. [Страница для разработчиков](https://vk.com/dev).
 
-Также вам нужно получить client_id. Для этого следует нажать на кнопку “Редактировать” для нового приложения, в адресной строке вы увидите его client_id.
-
 Псоле этого нужно получить свой личный ключ(access_token). Для этого стоит ознакомиться с процедурой [Implicit Flow](https://vk.com/dev/implicit_flow_user). 
 
  - Вам потребуются следующие права: photos, groups, wall и offline.
@@ -16,16 +14,14 @@
  - А Параметр scope указать через запятую, вот так: scope=photos,groups,wall,offline.
  - Токен выглядит как строка наподобие 533bacf01e1165b57531ad114461ae8736d6506a3, она появится в адресной строке, подписанная как access_token.
 
-А также вам нужно получить свой id Вконтакте и id своей группы Вконтакте. Как это сделать можно понять из этой [статьи](https://vk.com/faq18062)
+А также вам нужно получить id своей группы Вконтакте. Как это сделать можно понять из этой [статьи](https://vk.com/faq18062)
 
 Все токены и id, которые были описаны выше, нужно поместить в .env файл, его вы должны создать сами.
 
 Пример .env файла: 
 ```
-CLIENT_ID=31462351
-ACCESS_TOKEN=vk1.a.DFLUYR28OLIHGFLIUT9pIF9P785P9tfrp969Ppo98tP80T888oRODUYTRO86Edo8FILYfyifydyiskYTDYJTSJRFHGSJYRSZNGRASJSJ
-GROUP_ID=465364262
-USER_ID=274621764
+VK_ACCESS_TOKEN=vk1.a.DFLUYR28OLIHGFLIUT9pIF9P785P9tfrp969Ppo98tP80T888oRODUYTRO86Edo8FILYfyifydyiskYTDYJTSJRFHGSJYRSZNGRASJSJ
+VK_GROUP_ID=465364262
 ```
 Советую использовать [vetrualenv/venv](https://pypi.org/project/python-dotenv/0.9.1/) для изоляции проекта.
 
