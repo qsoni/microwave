@@ -44,9 +44,9 @@ def upload_pic_on_vk_server(upload_url):
         files = {
             'photo': file
         }
-        url = upload_url
-        response = requests.post(url, files=files)
-        response.raise_for_status()
+    url = upload_url
+    response = requests.post(url, files=files)
+    response.raise_for_status()
     response_content = response.json()
     photo_params = response_content['photo']
     photo_hash = response_content['hash']
@@ -67,7 +67,7 @@ def get_the_server_address(vk_access_token, vk_group_id):
     return upload_url
 
 
-def getting_a_comic():
+def get_comic():
     url = 'https://xkcd.com/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
@@ -81,7 +81,7 @@ def getting_a_comic():
     return img_link, description_of_comic
 
 
-def download_image(img_link, path,  params=''):
+def download_image(img_link, path, params=''):
     response = requests.get(img_link, params=params)
     response.raise_for_status()
     with open(path, 'wb') as file:
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     os.makedirs(IMAGES_DIR, exist_ok=True)
     path = os.path.join(IMAGES_DIR, image_name)
     try:
-        img_link, description_of_comic = getting_a_comic()
+        img_link, description_of_comic = get_comic()
         download_image(img_link, path, params='')
         upload_url = get_the_server_address(vk_access_token, vk_group_id)
         photo_params, photo_hash, photo_server = upload_pic_on_vk_server(upload_url)
