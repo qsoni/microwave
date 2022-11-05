@@ -92,7 +92,6 @@ if __name__ == '__main__':
     load_dotenv()
     vk_group_id = os.getenv('VK_GROUP_ID')
     vk_access_token = os.getenv('VK_ACCESS_TOKEN')
-    vk_client_id = os.getenv('VK_CLIENT_ID')
     vk_user_id = os.getenv('VK_USER_ID')
     image_name = 'pc.jpg'
     os.makedirs(IMAGES_DIR, exist_ok=True)
